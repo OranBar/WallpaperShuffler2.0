@@ -21,6 +21,7 @@ public class WidgetTest extends AppWidgetProvider {
 
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, DisableWifi.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         // Get the layout for the App Widget and attach an on-click listener

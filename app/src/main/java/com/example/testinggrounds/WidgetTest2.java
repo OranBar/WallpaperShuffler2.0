@@ -17,10 +17,10 @@ public class WidgetTest2 extends AppWidgetProvider {
         RemoteViews remoteViews;
         ComponentName watchWidget;
 
-        remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_test2);
+        remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_test);
         watchWidget = new ComponentName(context, WidgetTest2.class);
 
-        remoteViews.setOnClickPendingIntent(R.id.b_doSmth, getPendingSelfIntent(context, SYNC_CLICKED));
+        remoteViews.setOnClickPendingIntent(R.id.b_wifi, getPendingSelfIntent(context, SYNC_CLICKED));
         appWidgetManager.updateAppWidget(watchWidget, remoteViews);
     }
 
