@@ -2,12 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#09C"
-    android:padding="@dimen/widget_margin">
+    android:background="#000099CC"
+    android:padding="@dimen/widget_margin"
+    android:visibility="visible"
+    tools:visibility="visible">
 
     <Button
-        android:id="@+id/b_wifi"
-        android:layout_width="wrap_content"
-        android:layout_height="85dp"
-        android:text="Disable Wifi" />
+        android:id="@+id/b_nextWall"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#B8B8B8"
+        android:text=">>" />
 </RelativeLayout>

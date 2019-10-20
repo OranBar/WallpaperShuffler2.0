@@ -27,7 +27,7 @@ public class WidgetTest extends AppWidgetProvider {
         // Get the layout for the App Widget and attach an on-click listener
         // to the button
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_test);
-        views.setOnClickPendingIntent(R.id.b_wifi, pendingIntent);
+        views.setOnClickPendingIntent(R.id.b_nextWall, pendingIntent);
 //        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget_provider_layout);
 
         // Instruct the widget manager to update the widget
