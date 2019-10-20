@@ -20,7 +20,7 @@ public class WidgetTest extends AppWidgetProvider {
 //        views.setTextViewText(R.id.appwidget_text, widgetText);
 
         // Create an Intent to launch ExampleActivity
-        Intent intent = new Intent(context, DisableWifi.class);
+        Intent intent = new Intent(context, ChangeWallpaper_Activity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 

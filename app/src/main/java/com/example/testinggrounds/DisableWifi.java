@@ -6,7 +6,6 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 public class DisableWifi extends AppCompatActivity {
 
