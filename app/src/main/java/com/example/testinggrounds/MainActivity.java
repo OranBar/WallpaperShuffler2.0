@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 Set<String> dirSet = loadDirSet();
 
                 m_uri_data = new Data.Builder()
-                        .putString(ChangeWallpaper_Worker.DIR_URI_STR_KEY, "")
-                        .putStringArray(ChangeWallpaper_Worker.DIR_LIST_URIS_STR_KEY, (dirSet.toArray(new String[0])))
+//                        .putString(ChangeWallpaper_Worker.DIR_URI_STR_KEY, "")
+//                        .putStringArray(ChangeWallpaper_Worker.DIR_LIST_URIS_STR_KEY, (dirSet.toArray(new String[0])))
                         .build();
 
                 OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(ChangeWallpaper_Worker.class)
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         displayTotalDirsAndFiles();
 
         Data m_uri_data = new Data.Builder()
-                .putStringArray(ChangeWallpaper_Worker.DIR_LIST_URIS_STR_KEY, (dirSet.toArray(new String[0])))
+//                .putStringArray(ChangeWallpaper_Worker.DIR_LIST_URIS_STR_KEY, (dirSet.toArray(new String[0])))
                 .build();
 
         return m_uri_data;
@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeWallpaper(Bitmap bm){
 
-        Log.v("OBTask","ChangeWallpaper!");
+        Log.v("OBTask","WPChanger!");
 
         WallpaperManager wallpaperManager =  WallpaperManager.getInstance(getApplicationContext());
 
