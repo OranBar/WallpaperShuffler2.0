@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -154,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
         //Third
         consoleButtons[2].setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Set<String> dirSet = loadDirSet();
 
                 m_uri_data = new Data.Builder()
 //                        .putString(ChangeWallpaper_Worker.DIR_URI_STR_KEY, "")
@@ -175,17 +177,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayTotalDirsAndFiles() {
-        int total = 0;
-        for(String uri_str : loadDirSet()){
-            total += getFilesFromDir(Uri.parse(uri_str)).length;
-        }
+        WPDatabaseConnection wpDatabase = new WPDatabaseConnection(this.getApplicationContext());
 
-        Toast startSequenceToast = Toast.makeText(getApplicationContext(), "Total Directories: "+loadDirSet().size()+"\nTotal Images: "+total, Toast.LENGTH_LONG);
+        int dirs = wpDatabase.getDirectories().size();
+        int images = wpDatabase.getAllWallpapers().size();
+
+        Toast startSequenceToast = Toast.makeText(getApplicationContext(), "Total Directories: "+dirs+"\nTotal Images: "+images, Toast.LENGTH_LONG);
         startSequenceToast.show();
 
-        Log.v("OBTask", "Total Directories: "+loadDirSet().size()+"\nTotal Images: "+total);
-    }
+        Log.v("OBTask", "Total Directories: "+dirs+"\nTotal Images: "+images);
 
+        int i = 0;
+        for(String dir : wpDatabase.getDirectories()){
+            Log.v("OBTask", "Directory "+i+" - "+dir+" | Uri = "+Uri.parse(dir));
+        }
+    }
     private Data m_uri_data;
 
     private void change_wallpaper_once_with_worker(){
@@ -201,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Data get_img_dir_uri_data(){
-        Set<String> dirSet = loadDirSet();
 
         displayTotalDirsAndFiles();
 
@@ -315,14 +320,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private Set<String> loadDirSet(){
-        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
-
-        Set<String> images_set = sharedPref.getStringSet(getString(R.string.images_dirs_key), new HashSet<String>());
-
-        return images_set;
-    }
-
     public void changeWallpaper(Bitmap bm){
 
         Log.v("OBTask","WPChanger!");
@@ -353,35 +350,16 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == RESULT_LOAD_FOLDER && resultCode == RESULT_OK && null != data) {
             Uri folderUri = data.getData();
-            AddDirReference(folderUri);
+
+            this.getContentResolver().takePersistableUriPermission(folderUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+//            AddDirReference(folderUri);
+            WPDatabaseConnection wpDatabase = new WPDatabaseConnection(this.getApplicationContext());
+
+            wpDatabase.addDirectory(folderUri);
         }
     }
 
-    private DocumentFile[] getFilesFromDir(Uri folderUri){
-        DocumentFile documentFile = DocumentFile.fromTreeUri(this, folderUri);
-
-        ContentResolver contentResolver = getContentResolver();
-
-        DocumentFile[] files = documentFile.listFiles();
-        return files;
-    }
-
-    public void AddDirReference(Uri directoryUri) {
-        String directoryUri_str = directoryUri.toString();
-        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
-
-        //Treat loaded set as immutable please.
-        Set<String> loaded_set_immutable = sharedPref.getStringSet(getString(R.string.images_dirs_key), new HashSet<String>());
-        //----
-        Set<String> images_set = new HashSet<>(loaded_set_immutable);
-
-        images_set.add(directoryUri_str);
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.clear();
-        editor.putStringSet(getString(R.string.images_dirs_key), images_set);
-        editor.apply();
-    }
 
     private boolean IsSoundOn_SharedPref(){
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);

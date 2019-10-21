@@ -26,16 +26,39 @@ public class WPDatabaseConnection {
         this.context = context;
     }
 
-    public String[] getDirectories(){
+    public void addDirectory(Uri directoryUri){
+        String directoryUri_str = directoryUri.toString();
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
+
+        //Treat loaded set as immutable please.
+        Set<String> loaded_set_immutable = sharedPref.getStringSet(context.getString(R.string.images_dirs_key), new HashSet<String>());
+        //----
+        Set<String> images_set = new HashSet<>(loaded_set_immutable);
+
+        images_set.add(directoryUri_str);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        //editor.clear();
+        editor.putStringSet(context.getString(R.string.images_dirs_key), images_set);
+        editor.apply();
+    }
+
+    public Set<String> getDirectories(){
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
 
         Set<String> images_dirs_set = sharedPref.getStringSet(context.getString(R.string.images_dirs_key), new HashSet<String>());
 
-        return images_dirs_set.toArray(new String[images_dirs_set.size()]);
+//        Set<String> rslt = new HashSet<>();
+//        for(String images_dir : images_dirs_set){
+//            images_dir = images_dir.replace("--", "");
+//            rslt.add(images_dir);
+//        }
+
+        return images_dirs_set;
     }
 
     public int getTotalWallpaperDirectoriesCount(){
-        return getDirectories().length;
+        return getDirectories().size();
     }
 
     public int getTotalWallpapersCount(){
@@ -83,7 +106,7 @@ public class WPDatabaseConnection {
         SharedPreferences.Editor editor = sharedPref.edit();
 
         Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH-mm");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH:mm");
         String formattedDate = df.format(df);
         editor.putString(context.getString(R.string.last_changetime), formattedDate);
         editor.apply();
@@ -91,7 +114,7 @@ public class WPDatabaseConnection {
 
     public List<Uri> getAllWallpapers() {
         int directoryIndex = 0;
-        String[] dirs = this.getDirectories();
+        Set<String> dirs = this.getDirectories();
         List<Uri> rslt = new ArrayList<>();
         for(String dir : dirs){
             rslt.addAll(this.getImages_FromDir(dir));

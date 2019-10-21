@@ -20,9 +20,8 @@ public class WPEngine {
         WPShuffler wpShuffler = new WPShuffler(context, wpDatabase);
         WPChanger wpChanger = new WPChanger(context);
 
-        String[] dirsUris_str = wpDatabase.getDirectories();
 
-        if(dirsUris_str == null || dirsUris_str.length == 0){
+        if(wpDatabase.getDirectories().size() == 0){
             Log.e("OBError", "No directories in list");
             return false;
         }
