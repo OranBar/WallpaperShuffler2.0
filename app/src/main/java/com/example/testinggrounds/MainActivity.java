@@ -396,7 +396,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.clear();
         editor.putBoolean(getString(R.string.sound_on), turnSoundOn);
         editor.apply();
     }

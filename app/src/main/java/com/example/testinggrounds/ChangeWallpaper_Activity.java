@@ -18,21 +18,25 @@ public class ChangeWallpaper_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("OBChangeWallpaperActivity", "Create");
+//        Log.v("OBChangeWallpaperActivity", "Create");
+//
+//        Context context = this.getApplicationContext();
+//        wpShuffler = new WPShuffler(context);
+//
+//        sound_on_change = IsSoundOn_SharedPref();
+//
+//        wpShuffler.next();
+//        Log.v("OBChangeWallpaperActivity", "Wallpaper Changed");
+//
+//        if(sound_on_change){
+//            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+//            r.play();
+//        }
 
-        Context context = this.getApplicationContext();
-        wpShuffler = new WPShuffler(context);
+        WPEngine engine = new WPEngine(this.getApplicationContext());
 
-        sound_on_change = IsSoundOn_SharedPref();
-
-        wpShuffler.next();
-        Log.v("OBChangeWallpaperActivity", "Wallpaper Changed");
-
-        if(sound_on_change){
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-            r.play();
-        }
+        engine.changeWallpaper(IsSoundOn_SharedPref());
 
         finish();
     }

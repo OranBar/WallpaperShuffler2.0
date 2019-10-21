@@ -11,6 +11,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 
+
+//Need class WPScaler and multiple subclasses that define scaling methods, if I want to do more of those.
 public class WPChanger {
 
     public Context context;
@@ -19,7 +21,7 @@ public class WPChanger {
         this.context = context;
     }
 
-    public void changeWallpaper(Uri bm_uri){
+    public void SetWallpaper(Uri bm_uri){
 
         Log.v("OBTask","Changing Wallpaper!");
 
@@ -63,8 +65,8 @@ public class WPChanger {
                 wallpaperManager.setBitmap(wallpaper);
             }
         } catch (IOException e) {
-            Log.e("OBTask", "Change Wallpaper FAILED");
-            Log.e("OBTask", e.getMessage());
+            Log.e("OBTask", "Change Wallpaper FAILED", e);
+//            Log.e("OBTask", e.getMessage());
         }
 
         Log.v("OBTask", "Change Wallpaper Successful");

@@ -2,11 +2,20 @@ package com.example.testinggrounds;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.net.Uri;
+import android.text.format.DateFormat;
+import android.util.Log;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import org.w3c.dom.Document;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class WPDatabaseConnection {
@@ -51,18 +60,42 @@ public class WPDatabaseConnection {
 
     public int getImagesCount_FromDir(String singleFolderUri_str){
         int total = 0;
-        total += getFilesFromDir(Uri.parse(singleFolderUri_str)).length;
+        total += getImages_FromDir(singleFolderUri_str).size();
         return total;
     }
 
-    public DocumentFile[] getFilesFromDir(Uri folderUri){
-        DocumentFile documentFile = DocumentFile.fromTreeUri(context, folderUri);
-
+    public List<Uri> getImages_FromDir(String dir){
+        List<Uri> rslt = new ArrayList<>();
+        DocumentFile documentFile = DocumentFile.fromTreeUri(context, Uri.parse(dir));
         DocumentFile[] files = documentFile.listFiles();
-        return files;
+
+        for (DocumentFile file : files){
+            if(file.getType().contains("image")){
+                rslt.add(file.getUri());
+            }
+        }
+        return rslt;
     }
 
     public void logWallpaperChanged(Uri wpUri) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
 
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH-mm");
+        String formattedDate = df.format(df);
+        editor.putString(context.getString(R.string.last_changetime), formattedDate);
+        editor.apply();
+    }
+
+    public List<Uri> getAllWallpapers() {
+        int directoryIndex = 0;
+        String[] dirs = this.getDirectories();
+        List<Uri> rslt = new ArrayList<>();
+        for(String dir : dirs){
+            rslt.addAll(this.getImages_FromDir(dir));
+        }
+        return rslt;
     }
 }

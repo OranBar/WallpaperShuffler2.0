@@ -6,6 +6,7 @@
     <string name="OBbWallpaperShuffler_SharedPrefName">Images_List</string>
     <string name="images_dirs_key">com.kingpub.wallpapershuffler.ShPrefKey_imagesDirs_uris</string>
     <string name="sound_on">com.kingpub.wallpapershuffler.Sound_On</string>
+    <string name="last_changetime">com.kingpub.wallpapershuffler.Last_Change_Time</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="Button_next_label"><![CDATA[>]]></string>
