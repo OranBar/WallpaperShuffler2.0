@@ -107,7 +107,7 @@ public class WPDatabaseConnection {
 
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH:mm");
-        String formattedDate = df.format(df);
+        String formattedDate = df.format(currentTime);
         editor.putString(context.getString(R.string.last_changetime), formattedDate);
         editor.apply();
     }
