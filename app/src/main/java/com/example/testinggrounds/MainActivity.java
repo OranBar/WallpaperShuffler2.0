@@ -119,9 +119,11 @@ public class MainActivity extends AppCompatActivity {
             return running;
         } catch (ExecutionException e) {
             e.printStackTrace();
+            Log.e("OBTask", "Error while checking worker status", e);
             return false;
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Log.e("OBTask", "Error while checking worker status", e);
             return false;
         }
     }
@@ -218,8 +220,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void BindOnClick_OfChangeButton(){
-        final Button changeTwiceButton = (Button) findViewById(R.id.changeButton);
-        changeTwiceButton.setOnClickListener(new View.OnClickListener() {
+        final Button startWorkerBtn = (Button) findViewById(R.id.changeButton);
+        startWorkerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 //                change_wallpaper_once_with_worker();
 
@@ -238,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        changeTwiceButton.setText("> Start <");
+        startWorkerBtn.setText("> Start <");
     }
 
     private void BindOnClick_OfStopper() {

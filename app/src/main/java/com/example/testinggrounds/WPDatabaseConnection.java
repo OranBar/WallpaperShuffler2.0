@@ -109,6 +109,7 @@ public class WPDatabaseConnection {
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH:mm");
         String formattedDate = df.format(currentTime);
         editor.putString(context.getString(R.string.last_changetime), formattedDate);
+        editor.putString(context.getString(R.string.currWpUri), wpUri.toString());
         editor.apply();
     }
 

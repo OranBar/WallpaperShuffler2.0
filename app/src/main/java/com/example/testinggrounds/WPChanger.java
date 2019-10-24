@@ -21,7 +21,7 @@ public class WPChanger {
         this.context = context;
     }
 
-    public void SetWallpaper(Uri bm_uri){
+    public void setWallpaper(Uri bm_uri){
 
         Log.v("OBTask","Changing Wallpaper!");
 
@@ -71,4 +71,6 @@ public class WPChanger {
 
         Log.v("OBTask", "Change Wallpaper Successful");
     }
+
+
 }

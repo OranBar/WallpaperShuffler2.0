@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.testinggrounds">
 
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <receiver android:name=".WPWidget">
+        <receiver
+            android:name=".WPWidget"
+            android:label="Full">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -21,9 +25,7 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/wpwidget_info" />
-        </receiver>
-
-        <!-- <uses-library android:name="com.google.android.things" /> -->
+        </receiver> <!-- <uses-library android:name="com.google.android.things" /> -->
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,7 +40,9 @@
             android:name=".ChangeWallpaper_Activity"
             android:theme="@style/Theme.Transparent" />
 
-        <receiver android:name=".WidgetTest">
+        <receiver
+            android:name=".WidgetTest"
+            android:label="Forward_Btn">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
