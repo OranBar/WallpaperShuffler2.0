@@ -34,7 +34,7 @@ public class ChangeWallpaper_Activity extends AppCompatActivity {
 //            r.play();
 //        }
 
-        WPEngine engine = new WPEngine(this.getApplicationContext());
+        WPEngine engine = new WPEngine(this);
 
         engine.changeWallpaper(IsSoundOn_SharedPref());
 
