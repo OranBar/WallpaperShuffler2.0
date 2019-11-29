@@ -14,7 +14,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver android:name=".WPWidget">
+        <activity android:name=".PlayPauseWPShuffle"></activity>
+        <activity
+            android:name=".OpenCurrentWP"
+            android:theme="@style/Theme.Transparent" />
+
         <receiver
             android:name=".WPWidget"
             android:label="Full">

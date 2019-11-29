@@ -45,7 +45,7 @@ public class ChangeWallpaper_Worker extends Worker {
 //        sound_on_change = IsSoundOn_SharedPref();
 //
 //        Uri selectedWallpaper = wpShuffler.next();
-//        wpChanger.SetWallpaper(selectedWallpaper);
+//        wpChanger.setWallpaper(selectedWallpaper);
 //        wpDatabase.logWallpaperChanged(selectedWallpaper);
 //
 ////        wpShuffler.next();
@@ -65,7 +65,7 @@ public class ChangeWallpaper_Worker extends Worker {
     public ListenableWorker.Result doWork() {
         WPEngine engine = new WPEngine(this.getApplicationContext());
 
-        boolean success = engine.changeWallpaper(IsSoundOn_SharedPref());
+        boolean success = engine.changeWallpaper_Once(IsSoundOn_SharedPref());
         if(success == false){
             return Result.failure();
         }

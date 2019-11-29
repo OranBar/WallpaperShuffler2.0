@@ -27,6 +27,8 @@ public class WPChanger {
 
         WallpaperManager wallpaperManager =  WallpaperManager.getInstance(context);
 
+//        wallpaperManager.setWallpaperOffsets(0,0);
+
         try {
             //import non-scaled bitmap wallpaper
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -61,6 +63,7 @@ public class WPChanger {
 
                 wallpaperManager.setBitmap(paddedWallpaper, null, false, WallpaperManager.FLAG_LOCK);
                 wallpaperManager.setBitmap(paddedWallpaper);
+
             } else {
                 wallpaperManager.setBitmap(wallpaper);
             }

@@ -10,6 +10,17 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
+import com.google.common.util.concurrent.ListenableFuture;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 public class WPEngine {
 
     public Context context;
@@ -18,7 +29,7 @@ public class WPEngine {
         this.context = context;
     }
 
-    public boolean changeWallpaper(boolean sound_on_change){
+    public boolean changeWallpaper_Once(boolean sound_on_change){
 
         WPDatabaseConnection wpDatabase = new WPDatabaseConnection(context);
         WPShuffler wpShuffler = new WPShuffler(context, wpDatabase);
@@ -55,5 +66,85 @@ public class WPEngine {
         }
 
         return true;
+    }
+
+    public void changeWallpaper_Repeated(int waitTime){
+        if(waitTime < 15){
+            Log.e("OBWPEngine", "Wait time is too low ("+waitTime+" < 15 (min) ) ");
+        }
+        PeriodicWorkRequest changeWallpaper_work = new PeriodicWorkRequest.Builder(ChangeWallpaper_Worker.class, 15, TimeUnit.MINUTES, 1, TimeUnit.MINUTES)
+                .addTag("WC")
+                .build();
+
+        WorkManager.getInstance().enqueueUniquePeriodicWork("ChangeWallpaper_Loop", ExistingPeriodicWorkPolicy.REPLACE, changeWallpaper_work);
+    }
+
+    public void stopChangeWallpaper_Repeated(){
+        Log.v("OBTask", "My Work is "+WorkManager.getInstance().getWorkInfosByTag("WC").toString());
+        Log.v("OBTask", "Is Canceled = "+WorkManager.getInstance().getWorkInfosByTag("WC").isCancelled());
+        Log.v("OBTask", "Is Done = "+WorkManager.getInstance().getWorkInfosByTag("WC").isDone());
+
+        if(WorkManager.getInstance().getWorkInfosByTag("WC").cancel(true)){
+            Log.v("OBTasks", "attempt to kill service");
+            WorkManager.getInstance().pruneWork();
+        }
+
+        Log.v("OBTask", "--My Work is "+WorkManager.getInstance().getWorkInfosByTag("WC").toString());
+        Log.v("OBTask", "--Is Canceled = "+WorkManager.getInstance().getWorkInfosByTag("WC").isCancelled());
+        Log.v("OBTask", "--Is Done = "+WorkManager.getInstance().getWorkInfosByTag("WC").isDone());
+        //------------------------
+
+        ListenableFuture<List<WorkInfo>> info = WorkManager.getInstance().getWorkInfosForUniqueWork("ChangeWallpaper_Loop");
+        Log.v("OBTask", "(Unique) My Work is "+info.toString());
+        Log.v("OBTask", "(Unique) Is Canceled = "+info.isCancelled());
+        Log.v("OBTask", "(Unique) Is Done = "+info.isDone());
+
+        WorkManager.getInstance().cancelUniqueWork("ChangeWallpaper_Loop");
+        WorkManager.getInstance().pruneWork();
+
+
+
+        Log.v("OBTask", "--(Unique) My Work is "+info.toString());
+        Log.v("OBTask", "--(Unique) Is Canceled = "+info.isCancelled());
+        Log.v("OBTask", "--(Unique) Is Done = "+info.isDone());
+
+        Log.v("OBTask","Stopped Wallpaper change task??");
+    }
+
+    //Perchè non mi andava di fare un'altra classe e fare felice la V*ri. Quella bastarda fumatrice
+    public static boolean isWPWorker_running() {
+        return isWorkScheduled("WC");
+    }
+
+    private static boolean isWorkScheduled(String tag) {
+        WorkManager instance = WorkManager.getInstance();
+        ListenableFuture<List<WorkInfo>> statuses = instance.getWorkInfosByTag(tag);
+        try {
+            boolean running = false;
+            List<WorkInfo> workInfoList = statuses.get();
+            for (WorkInfo workInfo : workInfoList) {
+                WorkInfo.State state = workInfo.getState();
+                running = running | state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED;
+            }
+            return running;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            Log.e("OBTask", "Error while checking worker status", e);
+            return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e("OBTask", "Error while checking worker status", e);
+            return false;
+        }
+    }
+
+
+    public void togglePlayStop(){
+        if(isWPWorker_running()){
+            stopChangeWallpaper_Repeated();
+        }else{
+            //TODO hardcoded time
+            changeWallpaper_Repeated(15);
+        }
     }
 }

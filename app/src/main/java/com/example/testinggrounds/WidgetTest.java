@@ -15,10 +15,6 @@ public class WidgetTest extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-//        CharSequence widgetText = context.getString(R.string.appwidget_text);
-        // Construct the RemoteViews object
-//        views.setTextViewText(R.id.appwidget_text, widgetText);
-
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, ChangeWallpaper_Activity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

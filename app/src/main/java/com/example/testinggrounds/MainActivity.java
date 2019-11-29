@@ -1,17 +1,11 @@
 package com.example.testinggrounds;
 
-import android.app.WallpaperManager;
-import android.content.ContentResolver;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,24 +15,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.work.Data;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,19 +72,45 @@ public class MainActivity extends AppCompatActivity {
         });
         firstButton.setText("Clear Directories");
 
+
         secondButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                Intent intent2 = new Intent();
+//                intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent2.setAction(Intent.ACTION_VIEW);
+                Context context = getApplicationContext();
+                SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
+                Uri wpUri = Uri.parse(sharedPref.getString(context.getString(R.string.currWpUri), ""));
+                Log.v("OBTask", "Curr wallpaper uri is "+wpUri);
+                intent2.setDataAndType(wpUri, "image/*");
+                startActivity(intent2);
             }
         });
-        secondButton.setText("Debug");
+        secondButton.setText("Open curr wall");
+
+//        secondButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+////                Intent intent = new Intent();
+////                String packageName = getApplicationContext().getPackageName();
+////                PowerManager pm = (PowerManager)
+////                        getApplicationContext().getSystemService(Context.POWER_SERVICE);
+////                if (pm.isIgnoringBatteryOptimizations(packageName))
+////                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+////                else {
+////                    intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+////                    intent.setData(Uri.parse("package:" + packageName));
+////                }
+////                getApplicationContext().startActivity(intent);
+//            }
+//        });
+//        secondButton.setText("Ignore Btry-Opt");
     }
 
     private void BindOnClick_CheckService(){
         Button checkServiceBtn = (Button) findViewById(R.id.checkBtn);
         checkServiceBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String dbgMsg = "Worker running? "+isWorkScheduled("WC");
+                String dbgMsg = "Worker running? "+new WPEngine(getApplicationContext()).isWPWorker_running();
                 Log.v("OBTask", dbgMsg);
                 Toast startSequenceToast = Toast.makeText(getApplicationContext(), dbgMsg, Toast.LENGTH_LONG);
                 startSequenceToast.show();
@@ -106,27 +118,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private boolean isWorkScheduled(String tag) {
-        WorkManager instance = WorkManager.getInstance();
-        ListenableFuture<List<WorkInfo>> statuses = instance.getWorkInfosByTag(tag);
-        try {
-            boolean running = false;
-            List<WorkInfo> workInfoList = statuses.get();
-            for (WorkInfo workInfo : workInfoList) {
-                WorkInfo.State state = workInfo.getState();
-                running = running | state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED;
-            }
-            return running;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            Log.e("OBTask", "Error while checking worker status", e);
-            return false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Log.e("OBTask", "Error while checking worker status", e);
-            return false;
-        }
-    }
 
     private void BindOnClick_AndChangeNames_OfConsoleButtons() {
         console = (TextView) findViewById(R.id.console_textview);
@@ -160,19 +151,8 @@ public class MainActivity extends AppCompatActivity {
         consoleButtons[2].setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                m_uri_data = new Data.Builder()
-//                        .putString(ChangeWallpaper_Worker.DIR_URI_STR_KEY, "")
-//                        .putStringArray(ChangeWallpaper_Worker.DIR_LIST_URIS_STR_KEY, (dirSet.toArray(new String[0])))
-                        .build();
-
-                OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(ChangeWallpaper_Worker.class)
-                        .setInputData(m_uri_data)
-                        .addTag("WC")
-                        .build();
-
-                WorkManager.getInstance().enqueue(request);
-
-                Log.v("OBTask", "Started One time Work "+request.getId());
+                WPEngine wpEngine = new WPEngine(getApplicationContext());
+                wpEngine.changeWallpaper_Once(IsSoundOn_SharedPref());
             }
         });
         consoleButtons[2].setText("Next Wallpaper");
@@ -194,48 +174,18 @@ public class MainActivity extends AppCompatActivity {
             Log.v("OBTask", "Directory "+i+" - "+dir+" | Uri = "+Uri.parse(dir));
         }
     }
-    private Data m_uri_data;
-
-    private void change_wallpaper_once_with_worker(){
-
-        m_uri_data = get_img_dir_uri_data();
-
-        OneTimeWorkRequest onetime_changeWallpaper_work = new OneTimeWorkRequest.Builder(ChangeWallpaper_Worker.class)
-                .setInputData(m_uri_data)
-                .addTag("WC")
-                .build();
-
-        WorkManager.getInstance().enqueue(onetime_changeWallpaper_work);
-    }
-
-    private Data get_img_dir_uri_data(){
-
-        displayTotalDirsAndFiles();
-
-        Data m_uri_data = new Data.Builder()
-//                .putStringArray(ChangeWallpaper_Worker.DIR_LIST_URIS_STR_KEY, (dirSet.toArray(new String[0])))
-                .build();
-
-        return m_uri_data;
-    }
 
     private void BindOnClick_OfChangeButton(){
         final Button startWorkerBtn = (Button) findViewById(R.id.changeButton);
         startWorkerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                change_wallpaper_once_with_worker();
 
-                m_uri_data = get_img_dir_uri_data();
+                displayTotalDirsAndFiles();
 
-                changeWallpaper_work = new PeriodicWorkRequest.Builder(ChangeWallpaper_Worker.class, 15, TimeUnit.MINUTES, 1, TimeUnit.MINUTES)
-                        .setInputData(m_uri_data)
-                        .addTag("WC")
-                        .build();
+                WPEngine wpEngine = new WPEngine(getApplicationContext());
+                wpEngine.changeWallpaper_Repeated(15);
 
-//                WorkManager.getInstance().enqueue(changeWallpaper_work);
-                WorkManager.getInstance().enqueueUniquePeriodicWork("ChangeWallpaper_Loop", ExistingPeriodicWorkPolicy.REPLACE, changeWallpaper_work);
-
-//                Log( "Started Work "+changeWallpaper_work.getId()+" at time "+ Calendar.getInstance().getTime());
+                updateWidget();
 
             }
         });
@@ -243,38 +193,22 @@ public class MainActivity extends AppCompatActivity {
         startWorkerBtn.setText("> Start <");
     }
 
+    private void updateWidget(){
+        Intent intentSync = new Intent(getApplicationContext(), WPWidget.class);
+        intentSync.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        sendBroadcast(intentSync);
+    }
+
     private void BindOnClick_OfStopper() {
         Button addImageButton = (Button) findViewById(R.id.addImageButton);
         addImageButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //Tag
-                Log.v("OBTask", "My Work is "+WorkManager.getInstance().getWorkInfosByTag("WC").toString());
-                Log.v("OBTask", "Is Canceled = "+WorkManager.getInstance().getWorkInfosByTag("WC").isCancelled());
-                Log.v("OBTask", "Is Done = "+WorkManager.getInstance().getWorkInfosByTag("WC").isDone());
 
-                if(WorkManager.getInstance().getWorkInfosByTag("WC").cancel(true)){
-                    Log.v("OBTasks", "attempt to kill service");
-                    WorkManager.getInstance().pruneWork();
-                }
+                WPEngine wpEngine = new WPEngine(getApplicationContext());
+                wpEngine.stopChangeWallpaper_Repeated();
 
-                Log.v("OBTask", "--My Work is "+WorkManager.getInstance().getWorkInfosByTag("WC").toString());
-                Log.v("OBTask", "--Is Canceled = "+WorkManager.getInstance().getWorkInfosByTag("WC").isCancelled());
-                Log.v("OBTask", "--Is Done = "+WorkManager.getInstance().getWorkInfosByTag("WC").isDone());
-                //------------------------
+                updateWidget();
 
-                ListenableFuture<List<WorkInfo>> info = WorkManager.getInstance().getWorkInfosForUniqueWork("ChangeWallpaper_Loop");
-                Log.v("OBTask", "(Unique) My Work is "+info.toString());
-                Log.v("OBTask", "(Unique) Is Canceled = "+info.isCancelled());
-                Log.v("OBTask", "(Unique) Is Done = "+info.isDone());
-
-                WorkManager.getInstance().cancelUniqueWork("ChangeWallpaper_Loop");
-                WorkManager.getInstance().pruneWork();
-
-                Log.v("OBTask", "--(Unique) My Work is "+info.toString());
-                Log.v("OBTask", "--(Unique) Is Canceled = "+info.isCancelled());
-                Log.v("OBTask", "--(Unique) Is Done = "+info.isDone());
-
-                Log.v("OBTask","Stopped Wallpaper change task??");
             }
         });
         addImageButton.setText("Stopper");
@@ -320,23 +254,6 @@ public class MainActivity extends AppCompatActivity {
                 t.show();
             }
         });
-    }
-
-    public void changeWallpaper(Bitmap bm){
-
-        Log.v("OBTask","WPChanger!");
-
-        WallpaperManager wallpaperManager =  WallpaperManager.getInstance(getApplicationContext());
-
-        try {
-            wallpaperManager.setBitmap(bm);
-            wallpaperManager.setBitmap(bm, null ,true, WallpaperManager.FLAG_LOCK);
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-            r.play();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private static final int RESULT_LOAD_FOLDER = 3;
