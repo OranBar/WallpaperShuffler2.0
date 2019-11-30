@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="#000099CC"
     android:padding="@dimen/widget_margin"
     android:visibility="visible"
@@ -11,6 +11,6 @@
         android:id="@+id/b_nextWall"
         android:layout_width="52dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="#B8B8B8"
+        android:backgroundTint="#33DCDCDC"
         android:text=">>" />
 </RelativeLayout>

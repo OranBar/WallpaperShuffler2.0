@@ -9,9 +9,11 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 import androidx.documentfile.provider.DocumentFile;
+import androidx.preference.PreferenceManager;
 
 import org.w3c.dom.Document;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -102,15 +104,20 @@ public class WPDatabaseConnection {
 
     public void logWallpaperChanged(Uri wpUri) {
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
-
         SharedPreferences.Editor editor = sharedPref.edit();
 
         Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH:mm");
-        String formattedDate = df.format(currentTime);
+        String formattedDate = formatDate(currentTime);
         editor.putString(context.getString(R.string.last_changetime), formattedDate);
         editor.putString(context.getString(R.string.currWpUri), wpUri.toString());
+
         editor.apply();
+    }
+
+    public String formatDate(Date date){
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-HH:mm");
+        String formattedDate = df.format(date);
+        return formattedDate;
     }
 
     public List<Uri> getAllWallpapers() {
@@ -128,5 +135,36 @@ public class WPDatabaseConnection {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putStringSet(context.getString(R.string.images_dirs_key), new HashSet<String>());
         editor.apply();
+    }
+
+    public Date getLastChangeTime(){
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
+
+        String lastChangeTime = sharedPref.getString(context.getString(R.string.last_changetime), "");
+
+        try {
+            Date date = new SimpleDateFormat("dd-MMM-HH:mm").parse(lastChangeTime);
+            return date;
+        } catch (ParseException e) {
+            return null;
+        }
+
+
+    }
+
+    public String getLastChangeTime_formatted(){
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
+
+        String lastChangeTime = sharedPref.getString(context.getString(R.string.last_changetime), "");
+
+        return lastChangeTime;
+    }
+
+    public int getMinutesBetweenChanges() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String interval_raw = preferences.getString("interval_time", "15");
+        int interval = Integer.parseInt(interval_raw);
+
+        return interval;
     }
 }

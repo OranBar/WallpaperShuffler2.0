@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,8 +17,11 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.work.PeriodicWorkRequest;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button startWorkerBtn = (Button) findViewById(R.id.startStop_btn);
+        startWorkerBtn.setEnabled(true);
+
         bindOnClick_AndChangeNames_OfAllButtons();
         bindFAB();
         bindSettings();
@@ -48,6 +55,17 @@ public class MainActivity extends AppCompatActivity {
         updateBackground(workerIsRunning);
         updateButton(workerIsRunning);
         updateWidget();
+        updateChangeTimes();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Button startWorkerBtn = (Button) findViewById(R.id.startStop_btn);
+        startWorkerBtn.setEnabled(true);
+
+        updateChangeTimes();
     }
 
     private void bindSettings() {
@@ -122,25 +140,71 @@ public class MainActivity extends AppCompatActivity {
         startWorkerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 boolean workerIsRunning = WPEngine.isWPWorker_running();
-                WPEngine wpEngine = new WPEngine(getApplicationContext());
+                Log.v("OBDebug", "Worker is running "+workerIsRunning);
+                final WPEngine wpEngine = new WPEngine(getApplicationContext());
 
                 if(workerIsRunning){
                     //Stop
                     wpEngine.stopChangeWallpaper_Repeated();
                 }else{
-                    //Start
-                    displayTotalDirsAndFiles();
-                    wpEngine.changeWallpaper_Repeated(15);
+                    //Avoid double clicks
+                    startWorkerBtn.setEnabled(false);
+
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    String interval_raw = preferences.getString("interval_time", "15");
+                    int interval = Integer.parseInt(interval_raw);
+                    Log.v("OBDebug", "interval is "+interval);
+
+                    boolean sound_on_change  = preferences.getBoolean("sound_on", false);
+
+                    //wpEngine.changeWallpaper_Once(sound_on_change);
+                    wpEngine.changeWallpaper_Repeated(interval);
+
+                    finish();
                 }
                 workerIsRunning = !workerIsRunning;//It is now opposite of when we asked the engine;
 
+                Log.v("OBDebug", "Updating UI");
                 updateBackground(workerIsRunning);
                 updateButton(workerIsRunning);
                 updateWidget();
+                updateChangeTimes();
+
+                Log.v("OBDebug", "Finish");
+
             }
         });
 
         startWorkerBtn.setText("> Start <");
+    }
+
+    private void updateChangeTimes(){
+        WPDatabaseConnection db = new WPDatabaseConnection(getApplicationContext());
+
+        String formattedFooterText = "";
+
+        Date lastChangeTime = db.getLastChangeTime();
+
+        if(WPEngine.isWPWorker_running()){
+            Date nextChangeTime = null;
+            int minutesBetweenChanges = db.getMinutesBetweenChanges();
+            if(lastChangeTime != null){
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(lastChangeTime);
+                calendar.add(Calendar.MINUTE, minutesBetweenChanges);
+                nextChangeTime = calendar.getTime();
+
+                formattedFooterText = String.format("Last change -> %s\nNext change -> %s", db.formatDate(lastChangeTime), db.formatDate(nextChangeTime) );
+            } else {
+                formattedFooterText = String.format("Last change -> %s\nNext change -> %s", "-", "-");
+            }
+        }else {
+            formattedFooterText = String.format("Last change -> %s\nNext change -> %s", db.formatDate(lastChangeTime), "-");
+        }
+
+        TextView footer_textview = findViewById(R.id.footer_txt);
+        footer_textview.setText(formattedFooterText);
+
     }
 
     private void updateButton(boolean workerIsRunning) {

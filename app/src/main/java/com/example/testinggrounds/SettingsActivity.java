@@ -55,7 +55,14 @@ public class SettingsActivity extends AppCompatActivity {
                     Integer parsedIntValue = tryParseInt((String) newValue);
                     if (parsedIntValue != null) {
                         if (parsedIntValue >= 15) {
-                            return true;
+                            if(parsedIntValue <= 525600){
+                                return true;
+                            }
+                            //Error. Number must be >=15
+                            Toast startSequenceToast = Toast.makeText(getContext(), "Invalid Input: About needs to be <= 525600 (1 year)", Toast.LENGTH_LONG);
+                            startSequenceToast.show();
+
+                            return false;
                         }
                         //Error. Number must be >=15
                         Toast startSequenceToast = Toast.makeText(getContext(), "Invalid Input: Number needs to be >=15", Toast.LENGTH_LONG);

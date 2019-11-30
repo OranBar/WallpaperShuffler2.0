@@ -9,14 +9,17 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +37,6 @@ public class WPEngine {
         WPDatabaseConnection wpDatabase = new WPDatabaseConnection(context);
         WPShuffler wpShuffler = new WPShuffler(context, wpDatabase);
         WPChanger wpChanger = new WPChanger(context);
-
 
         if(wpDatabase.getDirectories().size() == 0){
             Log.e("OBError", "No directories in list");
@@ -68,15 +70,24 @@ public class WPEngine {
         return true;
     }
 
+//    public boolean changeWallpaper_Once(boolean sound_on_change){
+//
+//        OneTimeWorkRequest changeWallpaper_work = new OneTimeWorkRequest.Builder(ChangeWallpaper_Worker.class).build();
+//
+//        WorkManager.getInstance(context).enqueue(changeWallpaper_work);
+//        return true;
+//    }
+
     public void changeWallpaper_Repeated(int waitTime){
         if(waitTime < 15){
             Log.e("OBWPEngine", "Wait time is too low ("+waitTime+" < 15 (min) ) ");
         }
-        PeriodicWorkRequest changeWallpaper_work = new PeriodicWorkRequest.Builder(ChangeWallpaper_Worker.class, 15, TimeUnit.MINUTES, 1, TimeUnit.MINUTES)
+        PeriodicWorkRequest changeWallpaper_periodicWork = new PeriodicWorkRequest.Builder(ChangeWallpaper_Worker.class, 15, TimeUnit.MINUTES)
                 .addTag("WC")
                 .build();
 
-        WorkManager.getInstance().enqueueUniquePeriodicWork("ChangeWallpaper_Loop", ExistingPeriodicWorkPolicy.REPLACE, changeWallpaper_work);
+        WorkManager.getInstance().enqueueUniquePeriodicWork("ChangeWallpaper_Loop", ExistingPeriodicWorkPolicy.REPLACE, changeWallpaper_periodicWork);
+        Log.v("OBDebug", "Work Enqueued ");
     }
 
     public void stopChangeWallpaper_Repeated(){

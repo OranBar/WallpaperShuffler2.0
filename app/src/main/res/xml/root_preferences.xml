@@ -57,7 +57,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
-            app:key="sound"
+            app:key="sound_on"
             app:title="Sound"
             app:summary="Play sound when the wallpaper is changed"
             />

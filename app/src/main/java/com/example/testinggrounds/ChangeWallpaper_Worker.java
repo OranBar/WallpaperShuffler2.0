@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.work.ListenableWorker;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -15,15 +16,12 @@ import androidx.work.WorkerParameters;
 public class ChangeWallpaper_Worker extends Worker {
 
     private String workrequestId = "";
-    public boolean sound_on_change;
 
     public ChangeWallpaper_Worker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         Log.v("OBChangeWallpaper", "Create");
         workrequestId = " (WorkRequestId= "+this.getId()+")";
-        sound_on_change = IsSoundOn_SharedPref();
     }
-
 
 //    @NonNull
 //    @Override
@@ -65,19 +63,14 @@ public class ChangeWallpaper_Worker extends Worker {
     public ListenableWorker.Result doWork() {
         WPEngine engine = new WPEngine(this.getApplicationContext());
 
-        boolean success = engine.changeWallpaper_Once(IsSoundOn_SharedPref());
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean sound_on_change  = preferences.getBoolean("sound_on", false);
+
+        boolean success = engine.changeWallpaper_Once(sound_on_change);
         if(success == false){
             return Result.failure();
         }
         return Result.success();
     }
 
-    private boolean IsSoundOn_SharedPref(){
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
-
-        //Treat loaded set as immutable please.
-        boolean is_sound_on = sharedPref.getBoolean(getApplicationContext().getString(R.string.sound_on), true);
-
-        return is_sound_on;
-    }
 }

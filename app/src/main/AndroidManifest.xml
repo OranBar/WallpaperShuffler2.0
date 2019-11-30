@@ -20,7 +20,7 @@
             android:launchMode="singleTop"
             android:parentActivityName="com.example.testinggrounds.MainActivity" >
 
-        ></activity>
+        </activity>
         <activity android:name=".PlayPauseWPShuffle" />
         <activity
             android:name=".OpenCurrentWP"
@@ -51,7 +51,8 @@
             android:theme="@style/Theme.Transparent" />
         <activity
             android:name=".ChangeWallpaper_Activity"
-            android:theme="@style/Theme.Transparent" />
+            android:theme="@style/Theme.Transparent"
+            android:launchMode= "singleInstance" />
 
         <receiver
             android:name=".WidgetTest"
