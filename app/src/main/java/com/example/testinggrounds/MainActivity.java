@@ -9,22 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.work.Data;
 import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
-
-import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,119 +35,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_old);
 
         BindOnClick_AndChangeNames_OfAllButtons();
     }
 
+    public void clearDirectories(View v) {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putStringSet(getString(R.string.images_dirs_key), new HashSet<String>());
+        editor.apply();
+    }
+
+
     private void BindOnClick_AndChangeNames_OfAllButtons() {
-        BindOnClick_AndChangeNames_First_Row_Buttons();
-        BindOnClick_AndChangeNames_OfConsoleButtons();
-        BindOnClick_CheckService();
-        BindOnClick_OfChangeButton();
-        BindOnClick_OfStopper();
-        BindOnClick_AndChangeNames_OfTestButton();
-        BindSoundSwitch();
+        BindOnClick_OfStartStopButton();
+//        BindSoundSwitch();
     }
 
-    private void BindOnClick_AndChangeNames_First_Row_Buttons() {
-        Button firstButton = (Button) findViewById(R.id.WPbutton1);
-        Button secondButton = (Button) findViewById(R.id.WPbutton2);
-
-        firstButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putStringSet(getString(R.string.images_dirs_key), new HashSet<String>());
-                editor.apply();
-            }
-        });
-        firstButton.setText("Clear Directories");
-
-
-        secondButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent2 = new Intent();
-//                intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent2.setAction(Intent.ACTION_VIEW);
-                Context context = getApplicationContext();
-                SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
-                Uri wpUri = Uri.parse(sharedPref.getString(context.getString(R.string.currWpUri), ""));
-                Log.v("OBTask", "Curr wallpaper uri is "+wpUri);
-                intent2.setDataAndType(wpUri, "image/*");
-                startActivity(intent2);
-            }
-        });
-        secondButton.setText("Open curr wall");
-
-//        secondButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-////                Intent intent = new Intent();
-////                String packageName = getApplicationContext().getPackageName();
-////                PowerManager pm = (PowerManager)
-////                        getApplicationContext().getSystemService(Context.POWER_SERVICE);
-////                if (pm.isIgnoringBatteryOptimizations(packageName))
-////                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-////                else {
-////                    intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-////                    intent.setData(Uri.parse("package:" + packageName));
-////                }
-////                getApplicationContext().startActivity(intent);
-//            }
-//        });
-//        secondButton.setText("Ignore Btry-Opt");
-    }
-
-    private void BindOnClick_CheckService(){
-        Button checkServiceBtn = (Button) findViewById(R.id.checkBtn);
-        checkServiceBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                String dbgMsg = "Worker running? "+new WPEngine(getApplicationContext()).isWPWorker_running();
-                Log.v("OBTask", dbgMsg);
-                Toast startSequenceToast = Toast.makeText(getApplicationContext(), dbgMsg, Toast.LENGTH_LONG);
-                startSequenceToast.show();
-            }
-        });
-    }
-
-
-    private void BindOnClick_AndChangeNames_OfConsoleButtons() {
-        console = (TextView) findViewById(R.id.console_textview);
-
-        consoleButtons = new Button[3];
-        consoleButtons[0] = (Button) findViewById(R.id.ConsoleBtn1);
-        consoleButtons[1] = (Button) findViewById(R.id.ConsoleBtn2);
-        consoleButtons[2] = (Button) findViewById(R.id.ConsoleBtn3);
-
-        //------- {Buttons setup
-
-        //First
-        consoleButtons[0].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                displayTotalDirsAndFiles();
-
-            }
-        });
-        consoleButtons[0].setText("Tot_Dirs/Imgs");
-
-        //Second
-        consoleButtons[1].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                pickFolder();
-            }
-        });
-        consoleButtons[1].setText("Pick Folder");
-
-        //Third
-        consoleButtons[2].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                WPEngine wpEngine = new WPEngine(getApplicationContext());
-                wpEngine.changeWallpaper_Once(IsSoundOn_SharedPref());
-            }
-        });
-        consoleButtons[2].setText("Next Wallpaper");
+    private void isServiceRunning_toast(){
+        String dbgMsg = "Worker running? "+WPEngine.isWPWorker_running();
+        Log.v("OBTask", dbgMsg);
+        Toast startSequenceToast = Toast.makeText(getApplicationContext(), dbgMsg, Toast.LENGTH_LONG);
+        startSequenceToast.show();
     }
 
     private void displayTotalDirsAndFiles() {
@@ -175,22 +77,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void BindOnClick_OfChangeButton(){
-        final Button startWorkerBtn = (Button) findViewById(R.id.changeButton);
+    private void BindOnClick_OfStartStopButton(){
+        final Button startWorkerBtn = (Button) findViewById(R.id.startStop_btn);
         startWorkerBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                displayTotalDirsAndFiles();
-
+                boolean workerIsRunning = WPEngine.isWPWorker_running();
                 WPEngine wpEngine = new WPEngine(getApplicationContext());
-                wpEngine.changeWallpaper_Repeated(15);
 
+                if(workerIsRunning){
+                    //Stop
+                    wpEngine.stopChangeWallpaper_Repeated();
+                }else{
+                    //Start
+                    displayTotalDirsAndFiles();
+                    wpEngine.changeWallpaper_Repeated(15);
+                }
+                workerIsRunning = !workerIsRunning//It is now opposite of when we asked the engine;
+
+                updateBackground(workerIsRunning);
                 updateWidget();
-
             }
         });
 
         startWorkerBtn.setText("> Start <");
+    }
+
+    private void updateBackground(boolean workerIsRunning) {
+        RelativeLayout layout = findViewById(R.id.activity_main);
+        if(workerIsRunning){
+            layout.setBackgroundResource(R.drawable.green_gradient);
+        }else{
+            layout.setBackgroundResource(R.drawable.red_gradient);
+        }
+
     }
 
     private void updateWidget(){
@@ -199,62 +118,17 @@ public class MainActivity extends AppCompatActivity {
         sendBroadcast(intentSync);
     }
 
-    private void BindOnClick_OfStopper() {
-        Button addImageButton = (Button) findViewById(R.id.addImageButton);
-        addImageButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                WPEngine wpEngine = new WPEngine(getApplicationContext());
-                wpEngine.stopChangeWallpaper_Repeated();
-
-                updateWidget();
-
-            }
-        });
-        addImageButton.setText("Stopper");
-    }
-
-    private void BindOnClick_AndChangeNames_OfTestButton() {
-        //Test button
-        final Button test = (Button) findViewById(R.id.test);
-        test.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.v("OBTask", "My Work is "+WorkManager.getInstance().getWorkInfosByTag("WC").toString());
-                Log.v("OBTask", "Is Canceled = "+WorkManager.getInstance().getWorkInfosByTag("WC").isCancelled());
-                Log.v("OBTask", "Is Done = "+WorkManager.getInstance().getWorkInfosByTag("WC").isDone());
-
-                ListenableFuture<List<WorkInfo>> info = WorkManager.getInstance().getWorkInfosForUniqueWork("ChangeWallpaper_Loop");
-
-                Log.v("OBTask", "(Unique) My Work is "+info.toString());
-                Log.v("OBTask", "(Unique) Is Canceled = "+info.isCancelled());
-                Log.v("OBTask", "(Unique) Is Done = "+info.isDone());
-
-                WorkManager.getInstance().cancelAllWork();
-
-                Log.v("OBTask", "--My Work is "+WorkManager.getInstance().getWorkInfosByTag("WC").toString());
-                Log.v("OBTask", "--Is Canceled = "+WorkManager.getInstance().getWorkInfosByTag("WC").isCancelled());
-                Log.v("OBTask", "--Is Done = "+WorkManager.getInstance().getWorkInfosByTag("WC").isDone());
-
-                Log.v("OBTask", "--(Unique) My Work is "+info.toString());
-                Log.v("OBTask", "--(Unique) Is Canceled = "+info.isCancelled());
-                Log.v("OBTask", "--(Unique) Is Done = "+info.isDone());
-            }
-        });
-        test.setText("SuperStopper");
-    }
-
-
-    private void BindSoundSwitch(){
-        Switch soundSwitch = (Switch) findViewById(R.id.switch1);
-        soundSwitch.setChecked(IsSoundOn_SharedPref());
-        soundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Update_IsSoundOn_SharedPref(isChecked);
-                Toast t = Toast.makeText(getApplicationContext(), "Sound is : "+isChecked, Toast.LENGTH_LONG);
-                t.show();
-            }
-        });
-    }
+//    private void BindSoundSwitch(){
+//        Switch soundSwitch = (Switch) findViewById(R.id.switch1);
+//        soundSwitch.setChecked(IsSoundOn_SharedPref());
+//        soundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                Update_IsSoundOn_SharedPref(isChecked);
+//                Toast t = Toast.makeText(getApplicationContext(), "Sound is : "+isChecked, Toast.LENGTH_LONG);
+//                t.show();
+//            }
+//        });
+//    }
 
     private static final int RESULT_LOAD_FOLDER = 3;
 
