@@ -13,6 +13,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.PeriodicWorkRequest;
 
@@ -38,11 +40,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         BindOnClick_AndChangeNames_OfAllButtons();
+        BindFAB();
 
         boolean workerIsRunning = WPEngine.isWPWorker_running();
         updateBackground(workerIsRunning);
         updateButton(workerIsRunning);
         updateWidget();
+    }
+
+    private void BindFAB() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickFolder();
+            }
+        });
     }
 
     public void clearDirectories(View v) {
