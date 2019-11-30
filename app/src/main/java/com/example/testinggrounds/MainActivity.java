@@ -43,9 +43,19 @@ public class MainActivity extends AppCompatActivity {
         BindFAB();
 
         boolean workerIsRunning = WPEngine.isWPWorker_running();
+        updateDirsAndImgsText();
         updateBackground(workerIsRunning);
         updateButton(workerIsRunning);
         updateWidget();
+    }
+
+    private void updateDirsAndImgsText() {
+        TextView dirsAndImgs = findViewById(R.id.dirs_img_txt);
+        WPDatabaseConnection wpDatabase = new WPDatabaseConnection(this.getApplicationContext());
+        int dirs = wpDatabase.getDirectories().size();
+        int images = wpDatabase.getAllWallpapers().size();
+        String text = String.format("Dirs/Imgs\n%d/%d", dirs, images);
+        dirsAndImgs.setText(text);
     }
 
     private void BindFAB() {
@@ -181,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
             WPDatabaseConnection wpDatabase = new WPDatabaseConnection(this.getApplicationContext());
 
             wpDatabase.addDirectory(folderUri);
+
+            updateDirsAndImgsText();
         }
     }
 

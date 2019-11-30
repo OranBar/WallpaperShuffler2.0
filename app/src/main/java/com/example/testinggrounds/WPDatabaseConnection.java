@@ -93,7 +93,7 @@ public class WPDatabaseConnection {
         DocumentFile[] files = documentFile.listFiles();
 
         for (DocumentFile file : files){
-            if(file.getType().contains("image")){
+            if(file.getType() != null && file.getType().contains("image")){
                 rslt.add(file.getUri());
             }
         }
