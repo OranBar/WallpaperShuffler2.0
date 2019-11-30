@@ -39,14 +39,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BindOnClick_AndChangeNames_OfAllButtons();
-        BindFAB();
+        bindOnClick_AndChangeNames_OfAllButtons();
+        bindFAB();
+        bindSettings();
 
         boolean workerIsRunning = WPEngine.isWPWorker_running();
         updateDirsAndImgsText();
         updateBackground(workerIsRunning);
         updateButton(workerIsRunning);
         updateWidget();
+    }
+
+    private void bindSettings() {
+        Button settingsBtn = findViewById(R.id.settings_btn);
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateDirsAndImgsText() {
@@ -58,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         dirsAndImgs.setText(text);
     }
 
-    private void BindFAB() {
+    private void bindFAB() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void BindOnClick_AndChangeNames_OfAllButtons() {
+    private void bindOnClick_AndChangeNames_OfAllButtons() {
         BindOnClick_OfStartStopButton();
 //        BindSoundSwitch();
     }

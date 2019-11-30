@@ -122,4 +122,11 @@ public class WPDatabaseConnection {
         }
         return rslt;
     }
+
+    public void clearAllDirectories(){
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.OBbWallpaperShuffler_SharedPrefName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putStringSet(context.getString(R.string.images_dirs_key), new HashSet<String>());
+        editor.apply();
+    }
 }
