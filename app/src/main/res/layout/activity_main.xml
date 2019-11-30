@@ -8,18 +8,18 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@drawable/green_gradient"
+    android:background="@drawable/red_gradient"
     tools:context="com.example.testinggrounds.MainActivity">
 
 
     <Button
-        android:id="@+id/start_btn"
+        android:id="@+id/startStop_btn"
         style="@style/Widget.AppCompat.Button"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/stop_button"
+        android:background="@drawable/start_button"
         android:text="Stop"
         android:textSize="25sp"
         android:textColor="#DDDDDD"

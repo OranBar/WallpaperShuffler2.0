@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_old);
+        setContentView(R.layout.activity_main);
 
         BindOnClick_AndChangeNames_OfAllButtons();
     }
@@ -92,14 +92,27 @@ public class MainActivity extends AppCompatActivity {
                     displayTotalDirsAndFiles();
                     wpEngine.changeWallpaper_Repeated(15);
                 }
-                workerIsRunning = !workerIsRunning//It is now opposite of when we asked the engine;
+                workerIsRunning = !workerIsRunning;//It is now opposite of when we asked the engine;
 
                 updateBackground(workerIsRunning);
+                updateButton(workerIsRunning);
                 updateWidget();
             }
         });
 
         startWorkerBtn.setText("> Start <");
+    }
+
+    private void updateButton(boolean workerIsRunning) {
+        final Button startWorkerBtn = (Button) findViewById(R.id.startStop_btn);
+
+        if(workerIsRunning){
+            startWorkerBtn.setBackgroundResource(R.drawable.stop_button);
+            startWorkerBtn.setText("Stop");
+        }else{
+            startWorkerBtn.setBackgroundResource(R.drawable.start_button);
+            startWorkerBtn.setText("Start");
+        }
     }
 
     private void updateBackground(boolean workerIsRunning) {
