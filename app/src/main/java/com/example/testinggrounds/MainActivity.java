@@ -38,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         BindOnClick_AndChangeNames_OfAllButtons();
+
+        boolean workerIsRunning = WPEngine.isWPWorker_running();
+        updateBackground(workerIsRunning);
+        updateButton(workerIsRunning);
+        updateWidget();
     }
 
     public void clearDirectories(View v) {
