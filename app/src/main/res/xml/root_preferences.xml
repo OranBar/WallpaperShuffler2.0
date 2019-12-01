@@ -53,6 +53,8 @@
         <EditTextPreference
             app:key="interval_time"
             app:title="Interval Time (Minutes)"
+            android:defaultValue="15"
+            app:defaultValue="15"
             android:inputType="number"
             app:useSimpleSummaryProvider="true" />
 

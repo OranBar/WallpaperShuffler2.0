@@ -1,6 +1,7 @@
 package com.example.testinggrounds;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -99,9 +101,26 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
 
-        public static void clearDirectories(Context context) {
-            WPDatabaseConnection db = new WPDatabaseConnection(context);
-            db.clearAllDirectories();
+        public static void clearDirectories(final Context context) {
+
+            new AlertDialog.Builder(context)
+                    .setTitle("Clear Directories Shuffle List")
+                    .setMessage("Are you sure you want to remove all directories from the shuffle list?")
+
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            WPDatabaseConnection db = new WPDatabaseConnection(context);
+                            db.clearAllDirectories();
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
 
 //        @Override
