@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,10 +44,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button startWorkerBtn = (Button) findViewById(R.id.startStop_btn);
+        Button startWorkerBtn = findViewById(R.id.startStop_btn);
         startWorkerBtn.setEnabled(true);
 
-        bindOnClick_AndChangeNames_OfAllButtons();
+        ProgressBar progressBar = findViewById(R.id.engines_up_bar);
+        progressBar.setVisibility(View.INVISIBLE);
+
+        BindOnClick_OfStartStopButton();
         bindFAB();
         bindSettings();
 
@@ -64,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
         Button startWorkerBtn = (Button) findViewById(R.id.startStop_btn);
         startWorkerBtn.setEnabled(true);
+
+        ProgressBar progressBar = findViewById(R.id.engines_up_bar);
+        progressBar.setVisibility(View.INVISIBLE);
 
         updateChangeTimes();
     }
@@ -106,10 +113,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void bindOnClick_AndChangeNames_OfAllButtons() {
-        BindOnClick_OfStartStopButton();
-//        BindSoundSwitch();
-    }
 
     private void isServiceRunning_toast(){
         String dbgMsg = "Worker running? "+WPEngine.isWPWorker_running();
@@ -149,6 +152,10 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     //Avoid double clicks
                     startWorkerBtn.setEnabled(false);
+
+                    //Start progress bar anim until the program schedules the worker and closes itself
+                    ProgressBar progressBar = findViewById(R.id.engines_up_bar);
+                    progressBar.setVisibility(View.VISIBLE);
 
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     String interval_raw = preferences.getString("interval_time", "15");
