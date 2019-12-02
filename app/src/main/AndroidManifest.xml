@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.testinggrounds">
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -13,7 +14,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+
+        tools:ignore="GoogleAppIndexingWarning">
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -26,17 +30,18 @@
             android:name=".OpenCurrentWP"
             android:theme="@style/Theme.Transparent" />
 
-        <receiver
-            android:name=".WPWidget"
-            android:label="Full">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+<!--        <receiver-->
+<!--            android:name=".WPWidget"-->
+<!--            android:label="Full">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+<!--            </intent-filter>-->
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/wpwidget_info" />
-        </receiver> <!-- <uses-library android:name="com.google.android.things" /> -->
+<!--            <meta-data-->
+<!--                android:name="android.appwidget.provider"-->
+<!--                android:resource="@xml/wpwidget_info" />-->
+<!--        </receiver> &lt;!&ndash; <uses-library android:name="com.google.android.things" /> &ndash;&gt;-->
+
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.Design.NoActionBar" >
@@ -55,8 +60,9 @@
             android:launchMode= "singleInstance" />
 
         <receiver
-            android:name=".WidgetTest"
+            android:name=".ForwardBtnWidget"
             android:label="Forward_Btn">
+
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.io.IOException;
@@ -51,12 +52,16 @@ public class WPChanger {
 //                        decodedSampleBitmap, b_width, b_height, false);
 //            Bitmap wallpaper = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper, options);
 
-            if (wallpaperManager.getDesiredMinimumWidth() > wallpaper.getWidth() &&
+
+
+            if (wallpaperManager.getDesiredMinimumWidth() > wallpaper.getWidth() ||
                     wallpaperManager.getDesiredMinimumHeight() > wallpaper.getHeight()) {
                 //add padding to wallpaper so background image scales correctly
                 int xPadding = Math.max(0, wallpaperManager.getDesiredMinimumWidth() - wallpaper.getWidth()) / 2;
                 int yPadding = Math.max(0, wallpaperManager.getDesiredMinimumHeight() - wallpaper.getHeight()) / 2;
+
                 Bitmap paddedWallpaper = Bitmap.createBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), Bitmap.Config.ARGB_8888);
+
                 int[] pixels = new int[wallpaper.getWidth() * wallpaper.getHeight()];
                 wallpaper.getPixels(pixels, 0, wallpaper.getWidth(), 0, 0, wallpaper.getWidth(), wallpaper.getHeight());
                 paddedWallpaper.setPixels(pixels, 0, wallpaper.getWidth(), xPadding, yPadding, wallpaper.getWidth(), wallpaper.getHeight());

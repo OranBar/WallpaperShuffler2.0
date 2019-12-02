@@ -192,24 +192,24 @@ public class MainActivity extends AppCompatActivity {
 
         Date lastChangeTime = db.getLastChangeTime();
 
-        if(WPEngine.isWPWorker_running()){
+        if(lastChangeTime != null) {
+            last_change_txt = String.format("Last change -> %s", db.formatDate(lastChangeTime));
+        } else {
+            last_change_txt = String.format("Last change -> %s", "-");
+        }
+
+        if(WPEngine.isWPWorker_running() && lastChangeTime != null) {
             Date nextChangeTime = null;
             int minutesBetweenChanges = db.getMinutesBetweenChanges();
-            if(lastChangeTime != null){
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(lastChangeTime);
-                calendar.add(Calendar.MINUTE, minutesBetweenChanges);
-                nextChangeTime = calendar.getTime();
 
-                last_change_txt = String.format("Last change -> %s", db.formatDate(lastChangeTime));
-                next_change_txt = String.format("Next change -> %s", db.formatDate(nextChangeTime) );
-            } else {
-                last_change_txt = String.format("Last change -> %s", "-");
-                next_change_txt = String.format("Next change -> %s", "-" );
-            }
-        }else {
-            last_change_txt = String.format("Last change -> %s", db.formatDate(lastChangeTime));
-            next_change_txt = String.format("Next change -> %s","-");
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(lastChangeTime);
+            calendar.add(Calendar.MINUTE, minutesBetweenChanges);
+            nextChangeTime = calendar.getTime();
+
+            next_change_txt = String.format("Next change -> %s", db.formatDate(nextChangeTime));
+        }else{
+            next_change_txt = String.format("Next change -> %s", "-" );
         }
 
         TextView lastChange_textview = findViewById(R.id.last_change_txt);

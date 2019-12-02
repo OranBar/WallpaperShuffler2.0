@@ -10,7 +10,7 @@ import android.widget.RemoteViews;
 /**
  * Implementation of App Widget functionality.
  */
-public class WidgetTest extends AppWidgetProvider {
+public class ForwardBtnWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
