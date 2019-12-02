@@ -22,7 +22,23 @@ public class WPChanger {
         this.context = context;
     }
 
-    public void setWallpaper(Uri bm_uri){
+    private Bitmap scaleBitmapKeepingAspectRatio(int targetWidth, Bitmap wallpaper){
+        float aspectRatio = wallpaper.getWidth() /
+                (float) wallpaper.getHeight();
+        int targetHeight = Math.round(targetWidth / aspectRatio);
+
+        Bitmap bitmap = Bitmap.createScaledBitmap(wallpaper, targetWidth, targetHeight, true);
+        wallpaper = bitmap;
+        return wallpaper;
+    }
+
+    private Bitmap scaleBitmap(int targetWidth, int targetHeight, Bitmap wallpaper){
+        Bitmap bitmap = Bitmap.createScaledBitmap(wallpaper, targetWidth, targetHeight, true);
+        wallpaper = bitmap;
+        return wallpaper;
+    }
+
+    public void setWallpaper(Uri bm_uri, boolean stretch){
 
         Log.v("OBTask","Changing Wallpaper!");
 
@@ -40,44 +56,68 @@ public class WPChanger {
             is = contentResolver.openInputStream(bm_uri);
             Bitmap wallpaper = BitmapFactory.decodeStream(is, null, options);
 
+            if(stretch){
+                wallpaper = scaleBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), wallpaper);
+            } else {
+                wallpaper = scaleBitmapKeepingAspectRatio(wallpaperManager.getDesiredMinimumWidth(), wallpaper);
+                if ( wallpaperNeedsPadding(wallpaper)){
+                    //add padding to wallpaper so background image scales correctly
+                    int xPadding = Math.max(0, wallpaperManager.getDesiredMinimumWidth() - wallpaper.getWidth()) / 2;
+                    int yPadding = Math.max(0, wallpaperManager.getDesiredMinimumHeight() - wallpaper.getHeight()) / 2;
 
-            float aspectRatio = wallpaper.getWidth() /
-                    (float) wallpaper.getHeight();
-            int b_width = 1080;
-            int b_height = Math.round(b_width / aspectRatio);
+                    Bitmap paddedWallpaper = Bitmap.createBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), Bitmap.Config.ARGB_8888);
 
-            Bitmap bitmap = Bitmap.createScaledBitmap(wallpaper, b_width, b_height, true);
-            wallpaper = bitmap;
+                    int[] pixels = new int[wallpaper.getWidth() * wallpaper.getHeight()];
+                    wallpaper.getPixels(pixels, 0, wallpaper.getWidth(), 0, 0, wallpaper.getWidth(), wallpaper.getHeight());
+                    paddedWallpaper.setPixels(pixels, 0, wallpaper.getWidth(), xPadding, yPadding, wallpaper.getWidth(), wallpaper.getHeight());
+
+                    wallpaper = paddedWallpaper;
+
+
+                }
+            }
+
+            wallpaperManager.setBitmap(wallpaper, null, false, WallpaperManager.FLAG_LOCK);
+            wallpaperManager.setBitmap(wallpaper);
+
+            //Scale while keeping aspect ratio
+
 //                decodedSampleBitmap = Bitmap.createScaledBitmap(
 //                        decodedSampleBitmap, b_width, b_height, false);
 //            Bitmap wallpaper = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper, options);
 
 
-
-            if (wallpaperManager.getDesiredMinimumWidth() > wallpaper.getWidth() ||
-                    wallpaperManager.getDesiredMinimumHeight() > wallpaper.getHeight()) {
-                //add padding to wallpaper so background image scales correctly
-                int xPadding = Math.max(0, wallpaperManager.getDesiredMinimumWidth() - wallpaper.getWidth()) / 2;
-                int yPadding = Math.max(0, wallpaperManager.getDesiredMinimumHeight() - wallpaper.getHeight()) / 2;
-
-                Bitmap paddedWallpaper = Bitmap.createBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), Bitmap.Config.ARGB_8888);
-
-                int[] pixels = new int[wallpaper.getWidth() * wallpaper.getHeight()];
-                wallpaper.getPixels(pixels, 0, wallpaper.getWidth(), 0, 0, wallpaper.getWidth(), wallpaper.getHeight());
-                paddedWallpaper.setPixels(pixels, 0, wallpaper.getWidth(), xPadding, yPadding, wallpaper.getWidth(), wallpaper.getHeight());
-
-                wallpaperManager.setBitmap(paddedWallpaper, null, false, WallpaperManager.FLAG_LOCK);
-                wallpaperManager.setBitmap(paddedWallpaper);
-
-            } else {
-                wallpaperManager.setBitmap(wallpaper);
-            }
+            //Check if needs padding
+//            if ( wallpaperNeedsPadding(wallpaper)){
+//                //add padding to wallpaper so background image scales correctly
+//                int xPadding = Math.max(0, wallpaperManager.getDesiredMinimumWidth() - wallpaper.getWidth()) / 2;
+//                int yPadding = Math.max(0, wallpaperManager.getDesiredMinimumHeight() - wallpaper.getHeight()) / 2;
+//
+//                Bitmap paddedWallpaper = Bitmap.createBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), Bitmap.Config.ARGB_8888);
+//
+//                int[] pixels = new int[wallpaper.getWidth() * wallpaper.getHeight()];
+//                wallpaper.getPixels(pixels, 0, wallpaper.getWidth(), 0, 0, wallpaper.getWidth(), wallpaper.getHeight());
+//                paddedWallpaper.setPixels(pixels, 0, wallpaper.getWidth(), xPadding, yPadding, wallpaper.getWidth(), wallpaper.getHeight());
+//
+//                wallpaperManager.setBitmap(paddedWallpaper, null, false, WallpaperManager.FLAG_LOCK);
+//                wallpaperManager.setBitmap(paddedWallpaper);
+//
+//            } else {
+//                wallpaperManager.setBitmap(wallpaper);
+//            }
         } catch (IOException e) {
             Log.e("OBTask", "Change Wallpaper FAILED", e);
 //            Log.e("OBTask", e.getMessage());
         }
 
         Log.v("OBTask", "Change Wallpaper Successful");
+    }
+
+    private boolean wallpaperNeedsPadding(Bitmap wallpaper) {
+        WallpaperManager wallpaperManager =  WallpaperManager.getInstance(context);
+
+        return (wallpaperManager.getDesiredMinimumWidth() > wallpaper.getWidth() ||
+                wallpaperManager.getDesiredMinimumHeight() > wallpaper.getHeight());
     }
 
 

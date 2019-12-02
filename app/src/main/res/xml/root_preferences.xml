@@ -64,11 +64,20 @@
             app:summary="Play sound when the wallpaper is changed"
             />
 
+        <SwitchPreferenceCompat
+            app:key="preserve_aspect_ratio"
+            app:title="Preserve aspect-ratio"
+            app:summary="Deactivating this option will stretch the images to fit the screen"
+            app:defaultValue="true"
+            android:defaultValue="true"
+            />
+
         <Preference
             android:layout="@layout/clear_directories"
             android:title="Privacy"
             android:key="clear_dirs_layout"
             >
+
 
         </Preference>
 

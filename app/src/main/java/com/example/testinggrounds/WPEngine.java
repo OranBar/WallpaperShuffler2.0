@@ -32,7 +32,7 @@ public class WPEngine {
         this.context = context;
     }
 
-    public boolean changeWallpaper_Once(boolean sound_on_change){
+    public boolean changeWallpaper_Once(boolean sound_on_change, boolean stretch){
 
         WPDatabaseConnection wpDatabase = new WPDatabaseConnection(context);
         WPShuffler wpShuffler = new WPShuffler(context, wpDatabase);
@@ -44,7 +44,7 @@ public class WPEngine {
         }
 
         Uri selectedWallpaper = wpShuffler.next();
-        wpChanger.setWallpaper(selectedWallpaper);
+        wpChanger.setWallpaper(selectedWallpaper, stretch);
         wpDatabase.logWallpaperChanged(selectedWallpaper);
 
         //Update last change time and widget

@@ -35,7 +35,9 @@ public class ChangeWallpaper_Activity extends AppCompatActivity {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean sound_on_change  = preferences.getBoolean("sound_on", false);
-        engine.changeWallpaper_Once(sound_on_change);
+        boolean preserve_aspect_ratio = preferences.getBoolean("preserve_aspect_ratio", false);
+        boolean stretch = !preserve_aspect_ratio;
+        engine.changeWallpaper_Once(sound_on_change, stretch);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);

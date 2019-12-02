@@ -56,7 +56,7 @@
             android:theme="@style/Theme.Transparent" />
         <activity
             android:name=".ChangeWallpaper_Activity"
-            android:theme="@style/Theme.Transparent"
+            android:theme="@style/Theme.AppCompat.Translucent"
             android:launchMode= "singleInstance" />
 
         <receiver

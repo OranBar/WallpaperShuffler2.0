@@ -65,8 +65,10 @@ public class ChangeWallpaper_Worker extends Worker {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean sound_on_change  = preferences.getBoolean("sound_on", false);
+        boolean preserve_aspect_ratio = preferences.getBoolean("preserve_aspect_ratio", false);
+        boolean stretch = !preserve_aspect_ratio;
 
-        boolean success = engine.changeWallpaper_Once(sound_on_change);
+        boolean success = engine.changeWallpaper_Once(sound_on_change, stretch);
         if(success == false){
             return Result.failure();
         }
