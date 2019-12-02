@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateChangeTimes(){
         WPDatabaseConnection db = new WPDatabaseConnection(getApplicationContext());
 
-        String formattedFooterText = "";
+        String last_change_txt = "", next_change_txt = "";
 
         Date lastChangeTime = db.getLastChangeTime();
 
@@ -201,17 +201,22 @@ public class MainActivity extends AppCompatActivity {
                 calendar.add(Calendar.MINUTE, minutesBetweenChanges);
                 nextChangeTime = calendar.getTime();
 
-                formattedFooterText = String.format("Last change -> %s\nNext change -> %s", db.formatDate(lastChangeTime), db.formatDate(nextChangeTime) );
+                last_change_txt = String.format("Last change -> %s", db.formatDate(lastChangeTime));
+                next_change_txt = String.format("Next change -> %s", db.formatDate(nextChangeTime) );
             } else {
-                formattedFooterText = String.format("Last change -> %s\nNext change -> %s", "-", "-");
+                last_change_txt = String.format("Last change -> %s", "-");
+                next_change_txt = String.format("Next change -> %s", "-" );
             }
         }else {
-            formattedFooterText = String.format("Last change -> %s\nNext change -> %s", db.formatDate(lastChangeTime), "-");
+            last_change_txt = String.format("Last change -> %s", db.formatDate(lastChangeTime));
+            next_change_txt = String.format("Next change -> %s","-");
         }
 
-        TextView footer_textview = findViewById(R.id.footer_txt);
-        footer_textview.setText(formattedFooterText);
+        TextView lastChange_textview = findViewById(R.id.last_change_txt);
+        lastChange_textview .setText(last_change_txt);
 
+        TextView nextChange_textview = findViewById(R.id.next_change_txt);
+        nextChange_textview .setText(next_change_txt);
     }
 
     private void updateButton(boolean workerIsRunning) {
