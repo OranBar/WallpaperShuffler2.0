@@ -20,29 +20,14 @@ public class ChangeWallpaper_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Get screen size.
-        DisplayMetrics metrics = new DisplayMetrics();
-        Display display = getWindowManager().getDefaultDisplay();
-        display.getMetrics(metrics);
-        final int screenWidth  = metrics.widthPixels;
-        final int screenHeight = metrics.heightPixels;
-
-        // 2. Make the wallpaperManager fit the screen size.
-        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
-        wallpaperManager.suggestDesiredDimensions(screenWidth, screenHeight);
-
         WPEngine engine = new WPEngine(this);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean sound_on_change  = preferences.getBoolean("sound_on", false);
         boolean preserve_aspect_ratio = preferences.getBoolean("preserve_aspect_ratio", false);
         boolean stretch = !preserve_aspect_ratio;
-        engine.changeWallpaper_Once(sound_on_change, stretch);
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
+        engine.changeWallpaper_Once(sound_on_change, stretch);
 
         finish();
     }

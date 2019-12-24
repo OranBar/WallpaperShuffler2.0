@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,12 @@ public class WPChanger {
 
         Log.v("OBTask","Changing Wallpaper!");
 
+        // 1. Get screen size.
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        final int screenWidth  = metrics.widthPixels;
+//        final int screenHeight = metrics.heightPixels;
+        final int screenHeight = 2280;
+
         WallpaperManager wallpaperManager =  WallpaperManager.getInstance(context);
 
 //        wallpaperManager.setWallpaperOffsets(0,0);
@@ -57,15 +64,17 @@ public class WPChanger {
             Bitmap wallpaper = BitmapFactory.decodeStream(is, null, options);
 
             if(stretch){
-                wallpaper = scaleBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), wallpaper);
+                wallpaper = scaleBitmap(screenWidth, screenHeight, wallpaper);
             } else {
-                wallpaper = scaleBitmapKeepingAspectRatio(wallpaperManager.getDesiredMinimumWidth(), wallpaper);
-                if ( wallpaperNeedsPadding(wallpaper)){
+                wallpaper = scaleBitmapKeepingAspectRatio(screenWidth, wallpaper);
+                if ( wallpaperNeedsPadding(screenWidth, screenHeight, wallpaper)){
                     //add padding to wallpaper so background image scales correctly
-                    int xPadding = Math.max(0, wallpaperManager.getDesiredMinimumWidth() - wallpaper.getWidth()) / 2;
-                    int yPadding = Math.max(0, wallpaperManager.getDesiredMinimumHeight() - wallpaper.getHeight()) / 2;
+                    int xPadding = Math.max(0, screenWidth - wallpaper.getWidth()) / 2;
+                    int yPadding = Math.max(0, screenHeight - wallpaper.getHeight()) / 2;
 
-                    Bitmap paddedWallpaper = Bitmap.createBitmap(wallpaperManager.getDesiredMinimumWidth(), wallpaperManager.getDesiredMinimumHeight(), Bitmap.Config.ARGB_8888);
+                    Bitmap paddedWallpaper = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888);
+
+                    //TODO: Create a big black bitmap here, then keep going
 
                     int[] pixels = new int[wallpaper.getWidth() * wallpaper.getHeight()];
                     wallpaper.getPixels(pixels, 0, wallpaper.getWidth(), 0, 0, wallpaper.getWidth(), wallpaper.getHeight());
@@ -113,11 +122,8 @@ public class WPChanger {
         Log.v("OBTask", "Change Wallpaper Successful");
     }
 
-    private boolean wallpaperNeedsPadding(Bitmap wallpaper) {
-        WallpaperManager wallpaperManager =  WallpaperManager.getInstance(context);
-
-        return (wallpaperManager.getDesiredMinimumWidth() > wallpaper.getWidth() ||
-                wallpaperManager.getDesiredMinimumHeight() > wallpaper.getHeight());
+    private boolean wallpaperNeedsPadding(int screenWidth, int screenHeight, Bitmap wallpaper) {
+        return (screenWidth > wallpaper.getWidth() || screenHeight > wallpaper.getHeight());
     }
 
 

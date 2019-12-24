@@ -10,6 +10,6 @@ public class PlayPauseWPShuffle extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_play_pause_wpshuffle);
-        new WPEngine(getApplicationContext()).togglePlayStop();
+//        new WPEngine(getApplicationContext()).togglePlayStop();
     }
 }
